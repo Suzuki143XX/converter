@@ -1,0 +1,816 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Converter Pro</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .counters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .counter-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .counter-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .counter-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .counter-value.low { color: #ffeb3b; }
+        .counter-value.empty { color: #ff5252; }
+        
+        .quality-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #28a745;
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .download-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .download-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .progress {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .progress.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .result {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .download-link:hover {
+            background: #218838;
+        }
+        
+        .plans-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+        
+        .plans-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        
+        .plan-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+        }
+        
+        .plan-card.featured {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            transform: scale(1.05);
+        }
+        
+        .plan-card.current {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+        
+        .plan-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .plan-price {
+            font-size: 32px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .plan-price span {
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .plan-features {
+            list-style: none;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .plan-features li {
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .quality-note {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .support-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        
+        .support-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .support-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .support-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .support-link:hover {
+            background: #e9ecef;
+        }
+        
+        .support-link.phone {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .support-link.email {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .upgrade-banner {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .upgrade-banner.show {
+            display: block;
+        }
+        
+        .quality-locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 600px) {
+            .row { grid-template-columns: 1fr; }
+            .counters { grid-template-columns: 1fr; }
+            .plan-card.featured { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Converter Card -->
+        <div class="main-card">
+            <div class="header">
+                <h1>🎵 YouTube Converter Pro</h1>
+                <p class="subtitle">Professional downloads with premium features</p>
+            </div>
+            
+            <!-- User Bar -->
+            <div class="user-bar" id="user-bar">
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">?</div>
+                    <div>
+                        <div id="user-name">Guest</div>
+                        <small id="user-plan" style="color: #666;">Free Plan</small>
+                    </div>
+                </div>
+                <div id="auth-buttons">
+                    <a href="/login" class="btn btn-primary">Sign in with Google</a>
+                </div>
+            </div>
+            
+            <!-- Download Counters -->
+            <div class="counters" id="counters">
+                <div class="counter-box">
+                    <div class="counter-label">MP3 Downloads Left</div>
+                    <div class="counter-value" id="mp3-counter">5</div>
+                </div>
+                <div class="counter-box">
+                    <div class="counter-label">MP4 Downloads Left</div>
+                    <div class="counter-value" id="mp4-counter">5</div>
+                </div>
+            </div>
+            
+            <!-- Quality Info -->
+            <div id="quality-info" class="quality-note" style="margin-bottom: 20px;">
+                Free Plan: Max 480p quality. Upgrade for higher resolutions.
+            </div>
+            
+            <!-- Upgrade Banner -->
+            <div class="upgrade-banner" id="upgrade-banner">
+                <strong>Limit Reached!</strong> Upgrade your plan to continue downloading.
+            </div>
+            
+            <!-- Converter Form -->
+            <div class="input-group">
+                <label for="url">YouTube URL</label>
+                <input type="text" id="url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+            
+            <div class="row">
+                <div class="input-group">
+                    <label for="type">Type</label>
+                    <select id="type" onchange="updateFormats()">
+                        <option value="audio">Audio Only</option>
+                        <option value="video">Video (MP4)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="format">Format</label>
+                    <select id="format">
+                        <option value="mp3">MP3</option>
+                        <option value="wav">WAV</option>
+                        <option value="flac">FLAC</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row" id="quality-row">
+                <div class="input-group">
+                    <label for="quality">Audio Quality</label>
+                    <select id="quality">
+                        <option value="128">128 kbps</option>
+                        <option value="192" selected>192 kbps</option>
+                        <option value="256">256 kbps</option>
+                        <option value="320">320 kbps</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row" id="video-quality-row" style="display: none;">
+                <div class="input-group">
+                    <label for="video-quality">
+                        Video Resolution
+                        <span id="max-quality-badge" class="quality-badge" style="display: none;">HD</span>
+                    </label>
+                    <select id="video-quality">
+                        <!-- Options populated dynamically based on plan -->
+                    </select>
+                </div>
+            </div>
+            
+            <button id="download-btn" class="download-btn" onclick="startDownload()">Download</button>
+            
+            <div id="progress" class="progress">
+                <div class="spinner"></div>
+                <div class="status" id="status-text">Starting download...</div>
+            </div>
+            
+            <div id="result" class="result">
+                <div id="result-message"></div>
+            </div>
+        </div>
+        
+        <!-- Pricing Plans -->
+        <div class="plans-section">
+            <h2 class="plans-title">💎 Upgrade Your Plan</h2>
+            <div class="plans-grid">
+                <div class="plan-card" id="plan-free">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">$0<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>5 MP3 Downloads</li>
+                        <li>5 MP4 Downloads</li>
+                        <li><strong>Max 480p Video</strong></li>
+                        <li>Basic Quality</li>
+                    </ul>
+                    <button class="btn btn-secondary" disabled>Current Plan</button>
+                </div>
+                
+                <div class="plan-card" id="plan-basic">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-price">$10<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>100 MP3 Downloads</li>
+                        <li>100 MP4 Downloads</li>
+                        <li><strong>480p - 720p Video</strong></li>
+                        <li>High Quality</li>
+                        <li>Priority Support</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="alert('Stripe integration coming soon!')">Upgrade</button>
+                </div>
+                
+                <div class="plan-card" id="plan-gold">
+                    <div class="plan-name">Gold</div>
+                    <div class="plan-price">$25<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>300 MP3 Downloads</li>
+                        <li>300 MP4 Downloads</li>
+                        <li><strong>480p - 720p Video</strong></li>
+                        <li>High Quality</li>
+                        <li>Priority Support</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="alert('Stripe integration coming soon!')">Upgrade</button>
+                </div>
+                
+                <div class="plan-card featured" id="plan-premium">
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-price">$50<span>/month</span></div>
+                    <ul class="plan-features">
+                        <li>1000 MP3 Downloads</li>
+                        <li>1000 MP4 Downloads</li>
+                        <li><strong>480p - 4K Video</strong></li>
+                        <li>Ultra Quality</li>
+                        <li>24/7 Support</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="alert('Stripe integration coming soon!')">Upgrade</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Support -->
+        <div class="support-section">
+            <h3 class="support-title">📞 Customer Care</h3>
+            <p style="margin-bottom: 15px; color: #666;">Need help? Contact our support team</p>
+            <div class="support-links">
+                <a href="tel:4092641887" class="support-link phone">
+                    <span>📱</span>
+                    <span>409-264-1887</span>
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&fs=1&to=gmelchor121@gmail.com" target="_blank" class="support-link email">
+                    <span>✉️</span>
+                    <span>gmelchor121@gmail.com</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userData = null;
+        
+        async function loadUserData() {
+            try {
+                const response = await fetch('/api/user');
+                userData = await response.json();
+                updateUI();
+            } catch (e) {
+                console.error('Failed to load user data');
+            }
+        }
+        
+        function updateUI() {
+            // Update counters
+            const mp3Counter = document.getElementById('mp3-counter');
+            const mp4Counter = document.getElementById('mp4-counter');
+            
+            mp3Counter.textContent = userData.usage.mp3.remaining;
+            mp4Counter.textContent = userData.usage.mp4.remaining;
+            
+            // Color code counters
+            if (userData.usage.mp3.remaining === 0) mp3Counter.classList.add('empty');
+            else if (userData.usage.mp3.remaining <= 2) mp3Counter.classList.add('low');
+            
+            if (userData.usage.mp4.remaining === 0) mp4Counter.classList.add('empty');
+            else if (userData.usage.mp4.remaining <= 2) mp4Counter.classList.add('low');
+            
+            // Update user bar
+            if (userData.logged_in) {
+                document.getElementById('user-name').textContent = userData.name;
+                document.getElementById('user-plan').textContent = userData.plan_name + ' Plan';
+                document.getElementById('user-avatar').textContent = userData.name.charAt(0).toUpperCase();
+                document.getElementById('auth-buttons').innerHTML = `
+                    <a href="/logout" class="btn btn-danger">Logout</a>
+                `;
+            }
+            
+            // Highlight current plan
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.classList.remove('current');
+            });
+            document.getElementById('plan-' + userData.plan).classList.add('current');
+            
+            // Update quality options and info
+            updateQualityOptions();
+            updateQualityInfo();
+            
+            // Show upgrade banner if limits reached
+            if (userData.usage.mp3.remaining === 0 || userData.usage.mp4.remaining === 0) {
+                document.getElementById('upgrade-banner').classList.add('show');
+            }
+        }
+        
+        function updateQualityInfo() {
+            const plan = userData.plan;
+            const limits = userData.limits;
+            const infoDiv = document.getElementById('quality-info');
+            
+            let qualityText = '';
+            if (plan === 'free') {
+                qualityText = 'Free Plan: Max 480p quality. Upgrade for 720p, 1080p, or 4K!';
+            } else if (plan === 'basic' || plan === 'gold') {
+                qualityText = `${limits.name} Plan: Up to 720p HD. Upgrade to Premium for 1080p and 4K!`;
+            } else if (plan === 'premium') {
+                qualityText = 'Premium Plan: Access to all qualities including 4K Ultra HD!';
+            }
+            
+            infoDiv.textContent = qualityText;
+        }
+        
+        function updateQualityOptions() {
+            const select = document.getElementById('video-quality');
+            const badge = document.getElementById('max-quality-badge');
+            const qualities = userData.limits.qualities || ['360', '480'];
+            const maxQuality = userData.limits.max_quality || 480;
+            
+            select.innerHTML = '';
+            
+            const qualityLabels = {
+                '360': '360p',
+                '480': '480p SD',
+                '720': '720p HD',
+                '1080': '1080p Full HD',
+                '1440': '1440p 2K',
+                '2160': '2160p 4K Ultra HD'
+            };
+            
+            qualities.forEach(q => {
+                const option = document.createElement('option');
+                option.value = q;
+                option.textContent = qualityLabels[q] || q + 'p';
+                select.appendChild(option);
+            });
+            
+            // Set default to highest available
+            select.value = qualities[qualities.length - 1];
+            
+            // Update badge
+            if (maxQuality >= 2160) {
+                badge.textContent = '4K';
+                badge.style.background = '#9b59b6';
+            } else if (maxQuality >= 1080) {
+                badge.textContent = 'Full HD';
+                badge.style.background = '#e74c3c';
+            } else if (maxQuality >= 720) {
+                badge.textContent = 'HD';
+                badge.style.background = '#f39c12';
+            } else {
+                badge.textContent = 'SD';
+                badge.style.background = '#95a5a6';
+            }
+            badge.style.display = 'inline-block';
+        }
+        
+        function updateFormats() {
+            const type = document.getElementById('type').value;
+            const formatSelect = document.getElementById('format');
+            const qualityRow = document.getElementById('quality-row');
+            const videoQualityRow = document.getElementById('video-quality-row');
+            
+            if (type === 'video') {
+                formatSelect.innerHTML = '<option value="mp4">MP4</option>';
+                formatSelect.disabled = true;
+                qualityRow.style.display = 'none';
+                videoQualityRow.style.display = 'grid';
+            } else {
+                formatSelect.innerHTML = `
+                    <option value="mp3">MP3</option>
+                    <option value="wav">WAV</option>
+                    <option value="flac">FLAC</option>
+                `;
+                formatSelect.disabled = false;
+                qualityRow.style.display = 'grid';
+                videoQualityRow.style.display = 'none';
+            }
+        }
+        
+        async function startDownload() {
+            const url = document.getElementById('url').value.trim();
+            const type = document.getElementById('type').value;
+            const format = document.getElementById('format').value;
+            const btn = document.getElementById('download-btn');
+            const progress = document.getElementById('progress');
+            const result = document.getElementById('result');
+            const statusText = document.getElementById('status-text');
+            
+            if (!url) {
+                alert('Please enter a YouTube URL');
+                return;
+            }
+            
+            // Check if user has downloads left
+            const remaining = type === 'audio' ? userData.usage.mp3.remaining : userData.usage.mp4.remaining;
+            if (remaining <= 0) {
+                alert('Download limit reached! Please upgrade your plan.');
+                document.getElementById('upgrade-banner').classList.add('show');
+                return;
+            }
+            
+            btn.disabled = true;
+            progress.classList.add('active');
+            result.classList.remove('show', 'success', 'error');
+            
+            const quality = type === 'video' 
+                ? document.getElementById('video-quality').value 
+                : document.getElementById('quality').value;
+            
+            try {
+                const response = await fetch('/download', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({url, type, format, quality})
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.classList.add('show', 'success');
+                    let qualityInfo = data.quality ? ` (${data.quality})` : '';
+                    result.innerHTML = `
+                        <strong>✅ Download Complete!</strong><br>
+                        ${data.filename}${qualityInfo}<br>
+                        Size: ${(data.size / 1024 / 1024).toFixed(2)} MB<br>
+                        ${data.message ? `<small>${data.message}</small><br>` : ''}
+                        <a href="/file/${encodeURIComponent(data.filename)}" class="download-link" download>
+                            Download File
+                        </a>
+                    `;
+                    await loadUserData(); // Refresh counters
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            } catch (error) {
+                result.classList.add('show', 'error');
+                result.innerHTML = `<strong>❌ Error:</strong> ${error.message}`;
+                if (error.message.includes('Quality limit') || error.message.includes('limit exceeded')) {
+                    document.getElementById('upgrade-banner').classList.add('show');
+                }
+            } finally {
+                btn.disabled = false;
+                progress.classList.remove('active');
+            }
+        }
+        
+        document.getElementById('url').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startDownload();
+        });
+        
+        loadUserData();
+    </script>
+</body>
+</html>
